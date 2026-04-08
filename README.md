@@ -1,3 +1,13 @@
+---
+title: OpenEnv Code Review
+emoji: 🚀
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_file: app.py
+pinned: false
+---
+
 # OpenEnv Environment Submission
 
 This repository contains the submission for the **Meta PyTorch OpenEnv Hackathon — Round 1**.
