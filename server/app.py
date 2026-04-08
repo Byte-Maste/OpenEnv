@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from server.environment import CodeReviewEnv
 
+from typing import Optional
+
 app = FastAPI(title="OpenEnv Code Review Space")
 
 _env = None
@@ -17,9 +19,10 @@ def ping():
     return {"status": "ok", "message": "Hugging Face Space is running"}
 
 @app.post("/reset")
-def reset(req: ResetRequest):
+def reset(req: Optional[ResetRequest] = None):
     global _env
-    _env = CodeReviewEnv(difficulty=req.difficulty)
+    difficulty = req.difficulty if req else "medium"
+    _env = CodeReviewEnv(difficulty=difficulty)
     obs = _env.reset()
     return {"observation": obs, "status": "reset_successful"}
 
