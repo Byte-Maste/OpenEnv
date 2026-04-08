@@ -2,7 +2,7 @@ import os
 import sys
 import traceback
 from openai import OpenAI
-from code_review_env import CodeReviewEnv
+from server.environment import CodeReviewEnv
 
 # -------------------------------------------------------------------
 # Configuration & Environment Variables

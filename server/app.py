@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional
-from code_review_env import CodeReviewEnv
+from server.environment import CodeReviewEnv
 
 app = FastAPI(title="OpenEnv Code Review Space")
 
@@ -50,6 +49,9 @@ def state():
         "correct_comments": _env.correct_comments
     }
 
-if __name__ == "__main__":
+def main():
     import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=7860)
+    uvicorn.run("server.app:app", host="0.0.0.0", port=7860)
+
+if __name__ == "__main__":
+    main()

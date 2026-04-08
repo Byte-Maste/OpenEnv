@@ -59,7 +59,7 @@ class CodeReviewEnv:
         enumerated_lines = [f"{i+1} | {line}" for i, line in enumerate(buggy_code_raw.split('\n'))]
         buggy_code = '\n'.join(enumerated_lines)
         
-        observation = f\"\"\"You are a strict code reviewer. Please review the following code identifying any bugs. Note that line numbers are provided on the left.
+        observation = f"""You are a strict code reviewer. Please review the following code identifying any bugs. Note that line numbers are provided on the left.
         
 {buggy_code}
 
@@ -67,7 +67,7 @@ Available actions:
 1. COMMENT <line_number> <issue_description>
 2. APPROVE
 3. REQUEST_CHANGES
-\"\"\"
+"""
         return observation
 
     def step(self, action):
