@@ -18,4 +18,4 @@ RUN uv sync --no-install-project
 
 EXPOSE 7860
 
-CMD ["python", "server/app.py"]
+CMD ["python", "-m", "server.app"]
