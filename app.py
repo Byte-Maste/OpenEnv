@@ -1,27 +1,55 @@
-import gradio as gr
-import subprocess
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Optional
+from code_review_env import CodeReviewEnv
 
-def run_inference():
-    try:
-        # Run inference.py and capture exact output
-        result = subprocess.run(['python', 'inference.py'], capture_output=True, text=True, timeout=30)
-        return result.stdout + "\n" + result.stderr
-    except subprocess.TimeoutExpired:
-        return "Process timed out after 30 seconds."
-    except Exception as e:
-        return str(e)
+app = FastAPI(title="OpenEnv Code Review Space")
 
-with gr.Blocks(title="OpenEnv Code Review Hackathon", theme=gr.themes.Soft()) as app:
-    gr.Markdown("# OpenEnv Environment: Code Review")
-    gr.Markdown("This interface runs the `inference.py` backend and displays the `[START]`, `[STEP]`, `[END]` output strictly required by the hackathon spec.")
+_env = None
+
+class ActionRequest(BaseModel):
+    action: str
+
+class ResetRequest(BaseModel):
+    difficulty: str = "medium"
+
+@app.get("/")
+def ping():
+    return {"status": "ok", "message": "Hugging Face Space is running"}
+
+@app.post("/reset")
+def reset(req: ResetRequest):
+    global _env
+    _env = CodeReviewEnv(difficulty=req.difficulty)
+    obs = _env.reset()
+    return {"observation": obs, "status": "reset_successful"}
+
+@app.post("/step")
+def step(req: ActionRequest):
+    global _env
+    if _env is None:
+        raise HTTPException(status_code=400, detail="Environment not initialized. Call /reset first.")
     
-    with gr.Row():
-        run_btn = gr.Button("Run Inference Agent")
-    
-    with gr.Row():
-        output_display = gr.Textbox(label="Agent Output Log", lines=15, interactive=False)
-        
-    run_btn.click(fn=run_inference, outputs=output_display)
+    obs, reward, done, error = _env.step(req.action)
+    return {
+        "observation": obs,
+        "reward": float(reward) if reward else 0.0,
+        "done": done,
+        "error": error
+    }
+
+@app.get("/state")
+def state():
+    global _env
+    if _env is None:
+        return {"status": "uninitialized"}
+    return {
+        "steps_taken": _env.steps_taken,
+        "rewards": _env.rewards,
+        "difficulty": _env.difficulty,
+        "correct_comments": _env.correct_comments
+    }
 
 if __name__ == "__main__":
-    app.launch(server_name="0.0.0.0", server_port=7860)
+    import uvicorn
+    uvicorn.run("app:app", host="0.0.0.0", port=7860)

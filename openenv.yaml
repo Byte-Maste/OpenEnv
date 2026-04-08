@@ -1,0 +1,14 @@
+name: code_review_env
+version: "1.0.0"
+description: "A Code Review environment that tests an agent's ability to locate bugs in code snippets."
+tasks:
+  - id: code_review_task_easy
+    description: "Review simple code snippets under 10 lines."
+  - id: code_review_task_medium
+    description: "Review moderate code snippets between 10 and 30 lines."
+  - id: code_review_task_hard
+    description: "Review complex code snippets over 30 lines."
+endpoints:
+  reset: "/reset"
+  step: "/step"
+  state: "/state"

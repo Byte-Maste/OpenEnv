@@ -1,7 +1,10 @@
 openai>=1.0.0
 python-dotenv
 datasets
-gradio
+fastapi
+uvicorn
+pydantic
+
 
 # Add any required OpenEnv or domain-specific packages below:
 # openenv
