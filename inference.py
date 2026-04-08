@@ -8,21 +8,16 @@ from code_review_env import CodeReviewEnv
 # Configuration & Environment Variables
 # -------------------------------------------------------------------
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
-MODEL_NAME = os.getenv("MODEL_NAME", "gpt-3.5-turbo")
+MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
 HF_TOKEN = os.getenv("HF_TOKEN")
 
-def validate_environment():
-    """Ensure required environment variables like HF_TOKEN are present."""
-    if not HF_TOKEN:
-        print("[STEP] step=0 action=init reward=0.00 done=true error=HF_TOKEN_missing")
-        print("[END] success=false steps=0 rewards=")
-        sys.exit(1)
+if HF_TOKEN is None:
+    raise ValueError("HF_TOKEN environment variable is required")
 
 # -------------------------------------------------------------------
 # Main Inference Loop
 # -------------------------------------------------------------------
 def main():
-    validate_environment()
 
     # Initialize OpenAI Client
     client = OpenAI(
