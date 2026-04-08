@@ -24,10 +24,10 @@ def validate_environment():
 def main():
     validate_environment()
 
-    # Initialize OpenAI Client (per requirements, use OpenAI Python client)
+    # Initialize OpenAI Client
     client = OpenAI(
         base_url=API_BASE_URL,
-        api_key=os.getenv("OPENAI_API_KEY", "dummy_if_not_needed_for_custom_endpoint")
+        api_key=HF_TOKEN
     )
 
     env = CodeReviewEnv()
