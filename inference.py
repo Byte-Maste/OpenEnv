@@ -30,48 +30,49 @@ def main():
         api_key=HF_TOKEN
     )
 
-    env = CodeReviewEnv()
-    
-    # [START] Output
-    print(f"[START] task={env.task_name} env={env.benchmark_name} model={MODEL_NAME}")
-
-    success = False
-    
-    try:
-        obs = env.reset()
-        done = False
+    for diff in ["easy", "medium", "hard"]:
+        env = CodeReviewEnv(difficulty=diff)
         
-        while not done:
-            # Replace dummy action with actual LLM generation using the standard OpenAI client
-            response = client.chat.completions.create(
-                model=MODEL_NAME,
-                messages=[
-                    {"role": "system", "content": "You are a precise code reviewer. Your ONLY allowed outputs are: 'COMMENT <line> <text>', 'APPROVE', or 'REQUEST_CHANGES'."},
-                    {"role": "user", "content": obs}
-                ],
-                max_tokens=100
-            )
-            action_str = response.choices[0].message.content.strip()
-            
-            obs, reward_str, done, error = env.step(action_str)
-            
-            error_str = error if error else "null"
-            done_str = "true" if done else "false"
+        # [START] Output
+        print(f"[START] task={env.task_name} env={env.benchmark_name} model={MODEL_NAME}")
 
-            # [STEP] Output
-            print(f"[STEP] step={env.steps_taken} action={action_str} reward={reward_str} done={done_str} error={error_str}")
-
-        success = True
-
-    except Exception as e:
-        error_msg = str(e).replace('\n', ' ')
-        print(f"[STEP] step={env.steps_taken} action=error reward=0.00 done=true error={error_msg}")
         success = False
-    finally:
-        # [END] Output MUST ALWAYS be emitted, even on exceptions
-        success_str = "true" if success else "false"
-        rewards_str = ",".join([f"{r:.2f}" for r in env.rewards])
-        print(f"[END] success={success_str} steps={env.steps_taken} rewards={rewards_str}")
+        
+        try:
+            obs = env.reset()
+            done = False
+            
+            while not done:
+                # Replace dummy action with actual LLM generation using the standard OpenAI client
+                response = client.chat.completions.create(
+                    model=MODEL_NAME,
+                    messages=[
+                        {"role": "system", "content": "You are a precise code reviewer. Your ONLY allowed outputs are: 'COMMENT <line_number> <text>', 'APPROVE', or 'REQUEST_CHANGES'."},
+                        {"role": "user", "content": obs}
+                    ],
+                    max_tokens=100
+                )
+                action_str = response.choices[0].message.content.strip()
+                
+                obs, reward_str, done, error = env.step(action_str)
+                
+                error_str = error if error else "null"
+                done_str = "true" if done else "false"
+
+                # [STEP] Output
+                print(f"[STEP] step={env.steps_taken} action={action_str} reward={reward_str} done={done_str} error={error_str}")
+
+            success = True
+
+        except Exception as e:
+            error_msg = str(e).replace('\n', ' ')
+            print(f"[STEP] step={env.steps_taken} action=error reward=0.00 done=true error={error_msg}")
+            success = False
+        finally:
+            # [END] Output MUST ALWAYS be emitted, even on exceptions
+            success_str = "true" if success else "false"
+            rewards_str = ",".join([f"{r:.2f}" for r in env.rewards])
+            print(f"[END] success={success_str} steps={env.steps_taken} rewards={rewards_str}")
 
 if __name__ == "__main__":
     main()
